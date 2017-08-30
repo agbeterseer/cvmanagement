@@ -26,6 +26,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+    // $schedule->command('backup:clean')->daily()->at('04:00');
+    // $schedule->command('backup:run')->daily()->at('05:00');
     }
 
     /**
@@ -37,4 +39,7 @@ class Kernel extends ConsoleKernel
     {
         require base_path('routes/console.php');
     }
+
+
+
 }

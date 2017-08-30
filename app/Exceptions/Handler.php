@@ -20,6 +20,7 @@ class Handler extends ExceptionHandler
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
+
     ];
 
     /**
@@ -42,11 +43,31 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return \Illuminate\Http\Response
      */
-    public function render($request, Exception $exception)
-    {
-        return parent::render($request, $exception);
+    // public function render($request, Exception $exception)
+    // {
+    //     return parent::render($request, $exception);
+    // }
+   public function render($request, Exception $e) {
+
+     if ($e instanceof ModelNotFoundException or $e instanceof NotFoundHttpException) {
+            // ajax 404 json feedback
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Not Found'], 404);
+            }
+
+            // normal 404 view page feedback
+            return response()->view('errors.missing', [], 404);
+        }
+
+
+ if ($e instanceof TokenMismatchException) {
+
+        return redirect()->route('home')->with('message', 'You page session expired. Please try again');
+       // return response()->view('errors.missing', [], 500);
     }
 
+   return parent::render($request, $e);
+}
     /**
      * Convert an authentication exception into an unauthenticated response.
      *
@@ -60,6 +81,6 @@ class Handler extends ExceptionHandler
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 
-        return redirect()->guest(route('login'));
+        return redirect()->guest('login');
     }
 }

@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'fileDestinationPath' => 'uploads',
+    'allowedFileTypes' => 'txt,doc,docx,pdf,rtf',
+    'maxFileSize' => 2000,
 
     /*
     |--------------------------------------------------------------------------
@@ -12,7 +15,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Rhizome cv-mgt'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,7 +59,7 @@ return [
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
-    |-------------------------------------------------------- ------------------
+    |--------------------------------------------------------------------------
     |
     | Here you may specify the default timezone for your application, which
     | will be used by the PHP date and date-time functions. We have gone
@@ -162,22 +165,30 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        Collective\Html\HtmlServiceProvider::class,
-        Zizaco\Entrust\EntrustServiceProvider::class,
+
 
         /*
          * Package Service Providers...
          */
         Laravel\Tinker\TinkerServiceProvider::class,
-
+        Zizaco\Entrust\EntrustServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+        Spatie\Backup\BackupServiceProvider::class,
+        Backpack\BackupManager\BackupManagerServiceProvider::class,
         /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
+        odannyc\Alertify\AlertifyServiceProvider::class, 
+
+     
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\GoogleDriveServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
 
     ],
 
@@ -230,7 +241,9 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade:: class,
         'Entrust'=> Zizaco\Entrust\EntrustFacade::class,
-
+        'Image' => Intervention\Image\Facades\Image::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Alertify' => odannyc\Alertify\Alertify::class,
 
     ],
 

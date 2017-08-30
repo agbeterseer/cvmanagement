@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Auth;
 use Illuminate\Http\Request;
-
+use App\Document;
+use App\Role;
+use App\User;
 class HomeController extends Controller
 {
     /**
@@ -13,7 +15,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth'); 
+        $this->middleware('auth');
     }
 
     /**
@@ -23,6 +25,10 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $documents = Document::all()->count();
+        $roles = Role::all()->count();
+        $users = User::all()->count();
+
+        return view('home', compact('documents', 'roles', 'users'), array('user' => Auth::user()));
     }
 }

@@ -16,6 +16,7 @@ return [
     |
     */
 
+
     'driver' => env('MAIL_DRIVER', 'smtp'),
 
     /*
@@ -29,7 +30,7 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+    'host' => env('MAIL_HOST', 'smtp.gmail.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,8 +57,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'agbe.terseer@gmail.com'),
+        'name' => env('MAIL_FROM_NAME', 'CV-Mgt'),
     ],
 
     /*
@@ -88,7 +89,7 @@ return [
 
     'password' => env('MAIL_PASSWORD'),
 
-    /*
+         /*
     |--------------------------------------------------------------------------
     | Sendmail System Path
     |--------------------------------------------------------------------------
@@ -99,7 +100,8 @@ return [
     |
     */
 
-    'sendmail' => '/usr/sbin/sendmail -bs',
+     // 'sendmail' => '/usr/sbin/sendmail -bs'
+     //C:\xampp
 
     /*
     |--------------------------------------------------------------------------

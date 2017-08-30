@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Roles;
+use App\Role;
 use Illuminate\Http\Request;
 use App\Http\Requests\RoleRequest;
+use App\Permission;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Facades\DB;
+use Auth;
 class RoleController extends Controller
 {
      /**
@@ -15,7 +17,9 @@ class RoleController extends Controller
      */ 
     public function __construct()
     {
-        $this->middleware('auth');
+        // $this->middleware(['permission:role-create','permission:role-edit', 'permission:role-delete']);
+         $this->middleware('auth');
+        // $this->middleware('role:admin');
     }
 
     /**
@@ -25,18 +29,14 @@ class RoleController extends Controller
      */
      public function index(Request $request)
     {
-        $s = $request->input('s');
-        $rolesme = Roles::latest()->search($s)->paginate(5);
-        //->paginate(5);
-     return view('rolesme.index',compact('rolesme', 's'));
-    }
+        // $s = $request->input('s');
+        // $rolesme = Roles::latest()->search($s)->paginate(5);
+        //return view('admin.role.index',compact('roles', 's'));
 
-    // public function index()
-    // {
-    //     $rolesme = Roles::all();
-    //     //->paginate(5);
-    //  return view('rolesme.index',compact('rolesme'));
-    // }
+        $roles = Role::all();
+          // $data = ['roles' => $roles];
+     return view('admin.role.index',compact('roles'), array('user' => Auth::user()));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -45,7 +45,8 @@ class RoleController extends Controller
      */
     public function create()
     {
-        return view('rolesme.create');
+        $permissions=Permission::all();
+        return view('admin.role.create',compact('permissions'), array('user' => Auth::user()));
     }
 
     /**
@@ -54,23 +55,27 @@ class RoleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(RoleRequest $request)
+    public function store(Request $request)
      {
-    //     $rolesme = new $rolesme;
-    //     $this->validate($request, [
-    //         'rolename' => 'required|unique:roles',
-    //         'description'=> 'required']);
-    //     $rolesm->rolename = $request->rolename;
-    //     $rolesm->description = $request->description;
-    //     $rolesme->save();
-
-        Roles::create($request->all());
-
-        Session::flash('success','item has been created cessfully');
+        // $rolesme = new $rolesme;
+        // $this->validate($request, [
+        //     'rolename' => 'required|unique:roles',
+        //     'description'=> 'required']);
+        // $rolesm->rolename = $request->rolename;
+        // $rolesm->description = $request->description;
+        // $rolesme->save();
+        // dd($request->all());
 
 
+        // create the role
+        $role=Role::create($request->except(['permission','_token']));
+        // add permission
+        foreach ($request->permission as $key => $value) {
+          
+            $role->attachPermission($value);
+        }
+        Session::flash('success','Role has been created cessfully');
         return redirect()->route('role.index');
-      // need some validation
     }
 
     /**
@@ -79,9 +84,9 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Roles $role)
+    public function show(Role $role)
     {
-     return view('rolesme.show',compact('role')); 
+     return view('role.show',compact('role')); 
     }
 
     /**
@@ -90,9 +95,17 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Roles $role)
+    // public function edit(Roles $role)
+    // {
+    //    return view('role.edit',compact('role')); 
+    // }
+     public function edit($id)
     {
-       return view('rolesme.edit',compact('role')); 
+        $role=Role::find($id);
+        $permissions=Permission::all();
+        $role_permissions = $role->perms()->pluck('id','id')->toArray();
+
+       return view('admin.role.edit',compact(['role','role_permissions','permissions']), array('user' => Auth::user())); 
     }
 
     /**
@@ -102,13 +115,28 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(RoleRequest $request, Roles $role)
-    {
-        $role->update($request->all());
-        Session::flash('success','item has been deleted cessfully');
-        return redirect()->route('role.index');
+    public function update(Request $request, $id){
+        // $role->update($request->all());
+        // Session::flash('success','item has been deleted cessfully');
+        // return redirect()->route('role.index');
+        // update Role
+        // dd($request->all());
+        if ($id) {
+            # code...
+         $role=Role::find($id);
+         $role->name=$request->name;
+         $role->display_name=$request->display_name;
+         $role->description=$request->description;
+         $role->save();
 
-
+         DB::table('permission_role')->where('role_id',$id)->delete();
+        // add permission
+        foreach ($request->permission as $key => $value) {
+            $role->attachPermission($value);
+        }
+    }
+       Session::flash('success','Role has been Updated cessfully');
+        return redirect()->route('role.index', array('user' => Auth::user()));
     }
 
     /**
@@ -117,12 +145,19 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Roles $role)
+    public function destroy($id)
     {
-       $role->delete();
-       Session::flash('success','item has been deleted cessfully');
+        if ($id) {
 
-       return redirect()->route('role.index');
+       DB::table("roles")->where('id',$id)->delete();
+       Session::flash('success','Role has been deleted successfully');
+ 
+        }else{
 
+            return 'ID is required';
+        }
+  
+ 
+    return redirect()->route('role.index')->withMessage('Role Deleted'); #
     }
 }
